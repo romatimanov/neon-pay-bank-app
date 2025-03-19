@@ -1,0 +1,19 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 40px;
+}
+.list {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+}
+.icon {
+  stroke: rgb(242, 242, 242);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.icon:hover {
+  stroke: rgb(162, 209, 255);
+}

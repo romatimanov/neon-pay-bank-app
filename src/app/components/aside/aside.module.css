@@ -1,0 +1,79 @@
+.aside {
+  padding: 15px 0 40px 0;
+  min-width: 250px;
+  border-right: 1px solid #c8e2f489;
+}
+.nav {
+  padding: 0 40px 30px 40px;
+}
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-bottom: 40px;
+}
+.img {
+  object-fit: contain;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.text {
+  color: #b1b1b1;
+}
+.item:hover .text {
+  color: rgb(162, 209, 255);
+}
+.item:hover .icon {
+  fill: rgb(162, 209, 255);
+}
+.icon {
+  width: 25px;
+  height: 25px;
+  fill: rgb(163, 163, 163);
+  transition: all 0.3s ease;
+}
+.active {
+  position: relative;
+}
+.active .icon {
+  fill: rgb(0, 196, 255);
+}
+.active .text {
+  color: rgb(0, 196, 255);
+}
+.item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -40px;
+  width: 2px;
+  background-color: rgb(0, 196, 255);
+  opacity: 0;
+  height: 100%;
+  transition: all 0.3s ease;
+  transform: scale(0);
+}
+.active.item::after {
+  opacity: 1;
+
+  transform: scale(1);
+}
+.item:hover .text {
+  color: rgb(162, 209, 255);
+}
+.item:hover .icon {
+  fill: rgb(162, 209, 255);
+}

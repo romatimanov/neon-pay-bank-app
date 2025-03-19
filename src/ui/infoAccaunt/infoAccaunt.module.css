@@ -1,0 +1,22 @@
+.info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 25px 35px;
+}
+.text {
+  color: #718ebf;
+  font-size: 16px;
+}
+.balance {
+  color: #242424;
+  font-size: 24px;
+  font-weight: 600;
+}
+.infoText {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
