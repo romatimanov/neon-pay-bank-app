@@ -208,7 +208,7 @@ export function Home() {
             value={filter}
             onChange={(e) => setFilter(e.target.value.toUpperCase())}
             placeholder={language === 'en' ? 'Filter by currency' : 'Фильтр по валюте'}
-            className={style.input}
+            className={`${style.input} ${style.filter}`}
           />
 
           {filteredCurrencyList.length > 0 ? (

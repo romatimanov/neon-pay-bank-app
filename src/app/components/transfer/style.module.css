@@ -11,6 +11,7 @@
   gap: 40px;
 }
 .websocketBox {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -30,6 +31,9 @@
 }
 .down {
   color: red;
+}
+.filter {
+  margin-bottom: 20px;
 }
 .rateList li {
   display: flex;
