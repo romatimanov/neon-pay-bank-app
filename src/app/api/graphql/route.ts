@@ -2,6 +2,7 @@ import { startServerAndCreateNextHandler } from '@as-integrations/next'
 import { ApolloServer } from '@apollo/server'
 import { readData, writeData, makeAccount } from '@/utils/utils'
 import cards from '@/contstants/server'
+import { NextRequest } from 'next/server'
 
 const typeDefs = `#graphql
   type Transaction {
@@ -109,4 +110,10 @@ const handler = startServerAndCreateNextHandler(server, {
   context: async (req) => ({ req })
 })
 
-export { handler as GET, handler as POST }
+export async function GET(req: NextRequest) {
+  return handler(req)
+}
+
+export async function POST(req: NextRequest) {
+  return handler(req)
+}
