@@ -41,7 +41,7 @@ export function MyAccaunts() {
       <div className={style.textgroup}>
         <h2 className="global-title">{language === 'en' ? 'My accounts' : 'Мои счета'}</h2>
         <Link className={style.button} href="/transfer">
-          {language === 'en' ? 'Transfer' : 'Перевод'}
+          {language === 'en' ? 'Transfers' : 'Переводы'}
         </Link>
       </div>
 

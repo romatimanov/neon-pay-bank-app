@@ -16,7 +16,7 @@ export function Aside({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   const nav = [
     { name: language === 'en' ? 'Dashboard' : 'Главная', icon: IconHome, path: '/' },
     { name: language === 'en' ? 'Accounts' : 'Счета', icon: User, path: '/accounts' },
-    { name: language === 'en' ? 'Transfer' : 'Перевод', icon: IconTransaction, path: '/transfer' }
+    { name: language === 'en' ? 'Transfers' : 'Переводы', icon: IconTransaction, path: '/transfer' }
   ]
 
   return (

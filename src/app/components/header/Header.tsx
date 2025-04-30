@@ -23,7 +23,7 @@ export function Header({
   const path = [
     { name: language === 'en' ? 'Overview' : 'Обзор', path: '/' },
     { name: language === 'en' ? 'Accounts' : 'Счета', path: '/accounts' },
-    { name: language === 'en' ? 'Transfer' : 'Перевод', path: '/transfer' }
+    { name: language === 'en' ? 'Transfers' : 'Переводы', path: '/transfer' }
   ]
 
   const toggleDropdown = () => {

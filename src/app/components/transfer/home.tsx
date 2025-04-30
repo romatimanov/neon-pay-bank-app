@@ -97,7 +97,7 @@ export function Home() {
 
   const options: AccountOption[] = accounts.map((a: any) => ({
     value: a.account,
-    label: `${a.account} — ${a.balance}₽`
+    label: `${a.account} — ${a.balance}$`
   }))
 
   const handleSubmit = async () => {
@@ -157,7 +157,7 @@ export function Home() {
     <div className={style.home}>
       <div className={style.transferContainer}>
         <div className={style.containerExchange}>
-          <h2 className="global-title">{language === 'en' ? 'Transfer' : 'С карты на карту'}</h2>
+          <h2 className="global-title">{language === 'en' ? 'Transfers' : 'С карты на карту'}</h2>
           <div className={style.transfer}>
             <label className={style.label}>{language ? 'From card' : 'С карты'}</label>
             {hasMounted && (

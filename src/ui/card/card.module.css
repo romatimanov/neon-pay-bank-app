@@ -35,14 +35,6 @@
   transition: all 0.3s ease;
 }
 
-.card:hover .cardChipTexture,
-.card:hover .cardTexture {
-  animation-name: texture;
-  animation-duration: 2.5s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-
 .cardInfo,
 .cardChipTexture,
 .cardTexture {
@@ -184,5 +176,14 @@
 @media (max-width: 920px) {
   .card {
     flex: auto;
+  }
+}
+@media (max-width: 768px) {
+  .cardChipTexture,
+  .cardTexture {
+    animation-name: texture !important;
+    animation-duration: 2.5s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
   }
 }
