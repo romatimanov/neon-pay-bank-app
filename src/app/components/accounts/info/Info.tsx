@@ -7,12 +7,12 @@ import { InfoAccount } from '@/ui/infoAccaunt/InfoAccount'
 import style from './info.module.css'
 import { formatBalance } from '@/utils/formatBalance'
 import { useCurrentLanguage } from '@/app/hook/useCurrentLanguage'
-import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { prepareChartData } from '@/utils/chartData'
+import { useMemo, useState } from 'react'
+import { TransactionsTable } from '@/ui/transactionsTable/TransactionsTable'
 
 export function Info({ id }: { id: string }) {
   const language = useCurrentLanguage()
-
+  const [activeBtn, setActiveBtn] = useState(1)
   const GET_ACCOUNT = gql`
     query GetAccount($id: String!) {
       account(id: $id) {
@@ -30,7 +30,8 @@ export function Info({ id }: { id: string }) {
 
   const { data, loading, error } = useQuery(GET_ACCOUNT, {
     client,
-    variables: { id }
+    variables: { id },
+    fetchPolicy: 'network-only'
   })
 
   const income = data?.account?.transactions
@@ -40,6 +41,24 @@ export function Info({ id }: { id: string }) {
   const expenses = data?.account?.transactions
     ?.filter((transaction: any) => transaction.from === id)
     .reduce((sum: number, transaction: any) => sum + transaction.amount, 0)
+
+  const allTransactions = useMemo(() => {
+    return [...(data?.account?.transactions || [])].reverse()
+  }, [data])
+
+  const incomeTransactions = useMemo(() => {
+    return [...(data?.account?.transactions || [])]
+      .filter((transaction: any) => transaction.to === id)
+      .reverse()
+  }, [data])
+
+  const expensesTransactions = useMemo(() => {
+    return [...(data?.account?.transactions || [])]
+      .filter((transaction: any) => transaction.from === id)
+      .reverse()
+  }, [data])
+
+  const lastTransactions = expensesTransactions[0]
 
   const infoAcc = [
     {
@@ -56,10 +75,31 @@ export function Info({ id }: { id: string }) {
       text: language === 'en' ? 'Expenses' : 'Расходы',
       balance: formatBalance(expenses),
       icon: '/acc3.png'
+    },
+    {
+      text: language === 'en' ? 'Last transactions' : 'Последняя транзакция',
+      balance: formatBalance(lastTransactions?.amount),
+      icon: '/acc4.png'
     }
   ]
 
-  const chartData = prepareChartData({ data, language: language ?? 'ru' })
+  const buttons = [
+    {
+      id: 1,
+      name: language === 'en' ? 'All transactions' : 'Все транзакции'
+    },
+    {
+      id: 2,
+      name: language === 'en' ? 'Income' : 'Доход'
+    },
+    {
+      id: 3,
+      name: language === 'en' ? 'Expenses' : 'Расходы'
+    }
+  ]
+  const handleClick = (id: number) => {
+    setActiveBtn(id)
+  }
 
   if (loading || error) {
     return <Loader loading={loading} error={error} />
@@ -73,49 +113,35 @@ export function Info({ id }: { id: string }) {
             <InfoAccount key={index} text={item.text} balance={item.balance} icon={item.icon} />
           ))}
         </div>
-        <div>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData} margin={{ top: 50, right: 20, bottom: -30, left: -10 }}>
-              <XAxis dataKey="day" tick={{ fontSize: 12 }} axisLine={false} />
-              <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'white',
-                  border: '1px solid #ddd',
-                  borderRadius: '5px',
-                  padding: '10px',
-                  color: '#333',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-                }}
-                itemStyle={{ color: '#333', fontSize: '14px' }}
-              />
-              <Legend
-                wrapperStyle={{
-                  top: 20,
-                  right: 20,
-                  backgroundColor: 'none',
-                  border: 'none',
-                  borderRadius: 3,
-                  lineHeight: '40px'
-                }}
-              />
-              <Bar
-                dataKey="incoming"
-                name={language === 'en' ? 'Diposit' : 'Депозит'}
-                fill="#16DBCC"
-                barSize={30}
-                radius={[6, 6, 0, 0]}
-              />
-              <Bar
-                dataKey="outgoing"
-                name={language === 'en' ? 'Withdraw' : 'Вывод'}
-                fill="#FF82AC"
-                barSize={30}
-                radius={[6, 6, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className={style.btnGroup}>
+          {buttons.map((item, index) => (
+            <button
+              key={index}
+              className={`${style.btn} ${activeBtn === item.id && style.active}`}
+              onClick={() => handleClick(item.id)}
+            >
+              {item.name}
+            </button>
+          ))}
         </div>
+        {activeBtn === 1 && (
+          <TransactionsTable
+            language={language ? language : 'ru'}
+            allTransactions={allTransactions}
+          />
+        )}
+        {activeBtn === 2 && (
+          <TransactionsTable
+            language={language ? language : 'ru'}
+            allTransactions={incomeTransactions}
+          />
+        )}
+        {activeBtn === 3 && (
+          <TransactionsTable
+            language={language ? language : 'ru'}
+            allTransactions={expensesTransactions}
+          />
+        )}
       </div>
     </>
   )

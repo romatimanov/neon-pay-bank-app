@@ -79,3 +79,18 @@
 .button:hover {
   color: rgb(162, 209, 255);
 }
+@media (max-width: 1220px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 920px) {
+  .cardsGroup {
+    flex-direction: column;
+  }
+}
+@media (max-width: 768px) {
+  .cards {
+    padding: 25px 15px;
+  }
+}

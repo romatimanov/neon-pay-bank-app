@@ -76,7 +76,7 @@ export function Cards() {
       <div className={style.cardContent}>
         <div className={style.cardTextGroup}>
           <h2 className="global-title">{language === 'en' ? 'My Cards' : 'Мои карты'}</h2>
-          <button className={style.button} onClick={() => route.push('/transactions')}>
+          <button className={style.button} onClick={() => route.push('/accounts')}>
             {language === 'en' ? 'See All' : 'Посмотреть все'}
           </button>
         </div>

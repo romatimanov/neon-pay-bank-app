@@ -64,3 +64,8 @@
 .date {
   white-space: nowrap;
 }
+@media (max-width: 768px) {
+  .mycards {
+    padding: 25px 15px;
+  }
+}

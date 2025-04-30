@@ -6,6 +6,7 @@ import client from '@/lib/apollo-client'
 import { useMemo } from 'react'
 import { Card } from '@/ui/card/Card'
 import { Loader } from '@/ui/loader/Loader'
+import Link from 'next/link'
 
 export function MyAccaunts() {
   const language = useCurrentLanguage()
@@ -38,10 +39,10 @@ export function MyAccaunts() {
   return (
     <div className={style.mycards}>
       <div className={style.textgroup}>
-        <h2 className="global-title">{language === 'en' ? 'My Cards' : 'Мои карты'}</h2>
-        <button className={style.button}>
-          {language === 'en' ? '+ Add Card' : '+ Добавить карту'}
-        </button>
+        <h2 className="global-title">{language === 'en' ? 'My accounts' : 'Мои счета'}</h2>
+        <Link className={style.button} href="/transfer">
+          {language === 'en' ? 'Transfer' : 'Перевод'}
+        </Link>
       </div>
 
       <div className={style.cards}>

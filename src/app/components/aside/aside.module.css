@@ -2,6 +2,7 @@
   padding: 15px 0 40px 0;
   min-width: 250px;
   border-right: 1px solid #c8e2f489;
+  transition: all 0.3s ease;
 }
 .nav {
   padding: 0 40px 30px 40px;
@@ -76,4 +77,20 @@
 }
 .item:hover .icon {
   fill: rgb(162, 209, 255);
+}
+@media (max-width: 768px) {
+  .aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    z-index: 100;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #0f161a, #4868a3, #112731);
+  }
+
+  .aside.open {
+    transform: translateX(0);
+  }
 }
