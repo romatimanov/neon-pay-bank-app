@@ -3,6 +3,8 @@ import { ApolloServer } from '@apollo/server'
 import { readData, writeData, makeAccount } from '@/utils/utils'
 import cards from '@/contstants/server'
 import { NextRequest } from 'next/server'
+import { supabase } from '@/lib/supabase'
+import { v4 as uuidv4 } from 'uuid'
 
 const typeDefs = `#graphql
   type Transaction {
@@ -33,73 +35,114 @@ const typeDefs = `#graphql
 
 const resolvers = {
   Query: {
-    cards: () => cards,
-    accounts: () => {
-      const data = readData()
-      return Object.values(data.accounts)
-        .filter((a: any) => a.mine)
-        .map((a: any) => ({
-          ...a,
-          transactions: [a.transactions.at(-1)].filter(Boolean)
-        }))
-    },
-    account: (_: any, { id }: { id: string }) => {
-      const data = readData()
-      return data.accounts[id]
-    },
-    outgoingTransactions: () => {
-      const data = readData()
-      const allOutgoing: any[] = []
+    accounts: async () => {
+      const { data, error } = await supabase.from('accounts').select('*').eq('mine', true)
+      if (error) throw error
 
-      for (const account of Object.values(data.accounts) as {
-        account: string
-        transactions: any[]
-      }[]) {
-        const outgoing = account.transactions?.filter((tx) => tx.from === account.account)
-        allOutgoing.push(...(outgoing || []))
+      // Последняя транзакция (пример, можно улучшить)
+      for (let acc of data) {
+        const { data: txs } = await supabase
+          .from('transactions')
+          .select('*')
+          .eq('from', acc.account)
+          .order('date', { ascending: false })
+          .limit(1)
+        acc.transactions = txs || []
       }
 
-      return allOutgoing
+      return data
+    },
+
+    account: async (_: any, { id }: { id: string }) => {
+      const { data: acc, error } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('account', id)
+        .single()
+      if (error) throw error
+
+      const { data: txs } = await supabase
+        .from('transactions')
+        .select('*')
+        .or(`from.eq.${id},to.eq.${id}`)
+        .order('date', { ascending: false })
+
+      return { ...acc, transactions: txs || [] }
+    },
+
+    outgoingTransactions: async () => {
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .order('date', { ascending: false })
+
+      if (error) throw error
+      return data
     }
   },
+
   Mutation: {
-    transfer: async (_: any, args: { from: string; to: string; amount: number }) => {
-      const { from, to, amount: rawAmount } = args
-      const amount = Number(rawAmount)
-      const data = readData()
+    transfer: async (
+      _: any,
+      { from, to, amount }: { from: string; to: string; amount: number }
+    ) => {
+      const amt = Number(amount)
 
-      const fromAccount = data.accounts[from]
-      let toAccount = data.accounts[to]
+      const { data: fromAcc, error: errFrom } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('account', from)
+        .single()
 
-      if (!fromAccount || !fromAccount.mine) throw new Error('Invalid account from')
+      const { data: toAccRaw } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('account', to)
+        .maybeSingle()
 
-      if (!toAccount) {
+      if (errFrom || !fromAcc?.mine) throw new Error('Invalid account from')
+
+      let toAcc = toAccRaw
+      if (!toAcc) {
         if (Math.random() < 0.25) {
-          toAccount = makeAccount(false, to)
-          data.accounts[to] = toAccount
+          const { data: created } = await supabase
+            .from('accounts')
+            .insert({ id: uuidv4(), account: to, balance: 0, mine: false })
+            .select()
+            .single()
+          toAcc = created
         } else {
           throw new Error('Invalid account to')
         }
       }
 
-      if (isNaN(amount) || amount < 0) throw new Error('Invalid amount')
-      if (fromAccount.balance < amount) throw new Error('Overdraft prevented')
+      if (amt < 0 || fromAcc.balance < amt) throw new Error('Overdraft prevented')
 
-      fromAccount.balance -= amount
-      toAccount.balance += amount
+      await Promise.all([
+        supabase
+          .from('accounts')
+          .update({ balance: fromAcc.balance - amt })
+          .eq('account', from),
+        supabase
+          .from('accounts')
+          .update({ balance: toAcc.balance + amt })
+          .eq('account', toAcc.account),
+        supabase.from('transactions').insert({
+          id: uuidv4(),
+          date: new Date().toISOString(),
+          from,
+          to: toAcc.account,
+          amount: amt
+        })
+      ])
 
-      const tx = {
-        date: new Date().toISOString(),
-        from: fromAccount.account,
-        to: toAccount.account,
-        amount
-      }
+      const { data: updated } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('account', from)
+        .single()
 
-      fromAccount.transactions.push(tx)
-      toAccount.transactions.push(tx)
-
-      writeData(data)
-      return fromAccount
+      return { ...updated, transactions: [] }
     }
   }
 }

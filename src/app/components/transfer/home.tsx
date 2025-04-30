@@ -123,7 +123,7 @@ export function Home() {
   }
 
   useEffect(() => {
-    const socket = new WebSocket('ws://neon-bank-ws.onrender.com')
+    const socket = new WebSocket('wss://neon-bank-ws.onrender.com')
 
     socket.onopen = () => {
       socket.send(JSON.stringify({ type: 'subscribe', channel: 'currency' }))
