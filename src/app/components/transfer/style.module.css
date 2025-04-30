@@ -18,13 +18,19 @@
   padding: 25px;
   background: #fff;
   border-radius: 15px;
-  max-height: 350px;
+  max-height: 344px;
   overflow: auto;
+}
+.containerExchange {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 .rateList {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  overflow: auto;
 }
 .up {
   color: green;

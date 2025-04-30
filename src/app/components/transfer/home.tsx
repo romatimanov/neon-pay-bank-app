@@ -156,79 +156,86 @@ export function Home() {
   return (
     <div className={style.home}>
       <div className={style.transferContainer}>
-        <div className={style.transfer}>
-          <label className={style.label}>{language ? 'From card' : 'С карты'}</label>
-          {hasMounted && (
-            <Select
-              className={style.select}
-              options={options}
-              value={from}
-              onChange={setFrom}
-              placeholder={language ? 'Select account' : 'Выберите счёт'}
+        <div className={style.containerExchange}>
+          <h2 className="global-title">{language === 'en' ? 'Transfer' : 'С карты на карту'}</h2>
+          <div className={style.transfer}>
+            <label className={style.label}>{language ? 'From card' : 'С карты'}</label>
+            {hasMounted && (
+              <Select
+                className={style.select}
+                options={options}
+                value={from}
+                onChange={setFrom}
+                placeholder={language ? 'Select account' : 'Выберите счёт'}
+              />
+            )}
+
+            <label className={style.label}>{language ? 'To card' : 'На карту'}</label>
+            {hasMounted && (
+              <Select
+                className={style.select}
+                options={options}
+                value={to}
+                onChange={setTo}
+                placeholder={language ? 'Select account' : 'Выберите счёт'}
+              />
+            )}
+
+            <label className={style.label}>{language ? 'Amount' : 'Сумма'}</label>
+            <input
+              type="text"
+              value={amount}
+              onChange={(e) => {
+                const value = e.target.value
+                if (/^\d*\.?\d*$/.test(value)) {
+                  setAmount(value)
+                }
+              }}
+              placeholder={language ? 'Enter amount' : 'Введите сумму'}
+              className={style.input}
             />
-          )}
 
-          <label className={style.label}>{language ? 'To card' : 'На карту'}</label>
-          {hasMounted && (
-            <Select
-              className={style.select}
-              options={options}
-              value={to}
-              onChange={setTo}
-              placeholder={language ? 'Select account' : 'Выберите счёт'}
-            />
-          )}
-
-          <label className={style.label}>{language ? 'Amount' : 'Сумма'}</label>
-          <input
-            type="text"
-            value={amount}
-            onChange={(e) => {
-              const value = e.target.value
-              if (/^\d*\.?\d*$/.test(value)) {
-                setAmount(value)
-              }
-            }}
-            placeholder={language ? 'Enter amount' : 'Введите сумму'}
-            className={style.input}
-          />
-
-          <button
-            className={style.button}
-            onClick={handleSubmit}
-            disabled={!from || !to || !amount}
-          >
-            {language === 'en' ? 'Transfer' : 'Перевести'}
-          </button>
+            <button
+              className={style.button}
+              onClick={handleSubmit}
+              disabled={!from || !to || !amount}
+            >
+              {language === 'en' ? 'Transfer' : 'Перевести'}
+            </button>
+          </div>
         </div>
 
-        <div className={style.websocketBox}>
-          <input
-            type="text"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value.toUpperCase())}
-            placeholder={language === 'en' ? 'Filter by currency' : 'Фильтр по валюте'}
-            className={`${style.input} ${style.filter}`}
-          />
+        <div className={style.containerExchange}>
+          <h2 className="global-title">{language === 'en' ? 'Exchange' : 'Курс валют'}</h2>
 
-          {filteredCurrencyList.length > 0 ? (
-            <ul className={style.rateList}>
-              {filteredCurrencyList.map((c, idx) => (
-                <li key={idx} className={style.rateItem}>
-                  <span className={style.ratePair}>
-                    {c.from}/{c.to}
-                  </span>
-                  <span className={`${style.rateValue} ${c.change > 0 ? style.up : style.down}`}>
-                    {c.rate} {c.change > 0 ? '↑' : c.change < 0 ? '↓' : '→'}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={style.rate}>
-              {language === 'en' ? 'No matching currencies...' : 'Валюты не найдены...'}
-            </p>
-          )}
+          <div className={style.websocketBox}>
+            <input
+              type="text"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value.toUpperCase())}
+              placeholder={language === 'en' ? 'Filter by currency' : 'Фильтр по валюте'}
+              className={`${style.input} ${style.filter}`}
+            />
+
+            {filteredCurrencyList.length > 0 ? (
+              <ul className={style.rateList}>
+                {filteredCurrencyList.map((c, idx) => (
+                  <li key={idx} className={style.rateItem}>
+                    <span className={style.ratePair}>
+                      {c.from}/{c.to}
+                    </span>
+                    <span className={`${style.rateValue} ${c.change > 0 ? style.up : style.down}`}>
+                      {c.rate} {c.change > 0 ? '↑' : c.change < 0 ? '↓' : '→'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={style.rate}>
+                {language === 'en' ? 'No matching currencies...' : 'Валюты не найдены...'}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
