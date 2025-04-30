@@ -3,13 +3,17 @@ import { gql, useQuery } from '@apollo/client'
 import style from './myAccaunts.module.css'
 import { useCurrentLanguage } from '@/app/hook/useCurrentLanguage'
 import client from '@/lib/apollo-client'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Card } from '@/ui/card/Card'
 import { Loader } from '@/ui/loader/Loader'
 import Link from 'next/link'
+import { useResize } from '@/app/hook/useResize'
 
 export function MyAccaunts() {
   const language = useCurrentLanguage()
+  const isMobile = useResize(768)
+
+  const [showAll, setShowAll] = useState(false)
 
   const GET_ACCOUNTS = gql`
     query {
@@ -32,6 +36,13 @@ export function MyAccaunts() {
     return [...(data?.accounts || [])].sort((a, b) => b.balance - a.balance)
   }, [data])
 
+  const visibleCards = useMemo(() => {
+    if (isMobile && !showAll) {
+      return sortedCards.slice(0, 3)
+    }
+    return sortedCards
+  }, [sortedCards, isMobile, showAll])
+
   if (loading || error) {
     return <Loader loading={loading} error={error} />
   }
@@ -46,16 +57,22 @@ export function MyAccaunts() {
       </div>
 
       <div className={style.cards}>
-        {sortedCards.map((card, index) => (
+        {visibleCards.map((card, index) => (
           <Card
             key={card.account}
             active={index === 0}
             balance={card.balance}
             cardNumber={card.account}
-            name={'Your name'}
+            name="Your name"
           />
         ))}
       </div>
+
+      {isMobile && sortedCards.length > 3 && !showAll && (
+        <button className={style.showMoreButton} onClick={() => setShowAll(true)}>
+          {language === 'en' ? 'Show more' : 'Показать ещё'}
+        </button>
+      )}
     </div>
   )
 }

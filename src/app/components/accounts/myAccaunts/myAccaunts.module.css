@@ -68,4 +68,9 @@
   .mycards {
     padding: 25px 15px;
   }
+  .showMoreButton {
+    display: flex;
+    margin: 0 auto;
+    font-size: 16px;
+  }
 }
