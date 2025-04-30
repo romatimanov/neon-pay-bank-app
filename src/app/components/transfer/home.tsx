@@ -50,6 +50,12 @@ const TRANSACTIONS = gql`
     }
   }
 `
+type ExchangeRate = {
+  from: string
+  to: string
+  rate: number
+  change: number
+}
 
 type AccountOption = {
   value: string
@@ -74,12 +80,20 @@ export function Home() {
   const [amount, setAmount] = useState('')
   const language = useCurrentLanguage()
   const hasMounted = useHasMounted()
+  const [filter, setFilter] = useState('')
   const { data: transactionsData } = useQuery(TRANSACTIONS)
   const allTransactions = (transactionsData?.outgoingTransactions || [])
     .slice()
     .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  const [currency, setCurrency] = useState<any>(null)
+  const [currencies, setCurrencies] = useState<Record<string, ExchangeRate>>({})
+
   const accounts = data?.accounts || []
+  const currencyList = Object.values(currencies).sort((a, b) =>
+    (a.from + a.to).localeCompare(b.from + b.to)
+  )
+  const filteredCurrencyList = currencyList.filter(
+    (c) => c.from.includes(filter) || c.to.includes(filter)
+  )
 
   const options: AccountOption[] = accounts.map((a: any) => ({
     value: a.account,
@@ -109,7 +123,7 @@ export function Home() {
   }
 
   useEffect(() => {
-    const socket = new WebSocket('wss://backend-qt31.onrender.com')
+    const socket = new WebSocket('ws://neon-bank-ws.onrender.com')
 
     socket.onopen = () => {
       socket.send(JSON.stringify({ type: 'subscribe', channel: 'currency' }))
@@ -117,7 +131,13 @@ export function Home() {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      setCurrency(data)
+      if (data.type === 'EXCHANGE_RATE_CHANGE') {
+        const key = `${data.from}/${data.to}`
+        setCurrencies((prev) => ({
+          ...prev,
+          [key]: data
+        }))
+      }
     }
 
     socket.onerror = (error) => {
@@ -183,13 +203,30 @@ export function Home() {
         </div>
 
         <div className={style.websocketBox}>
-          {currency ? (
-            <p className={style.rate}>
-              {language === 'en' ? 'Current rate:' : 'Текущий курс:'} {currency.rate}
-            </p>
+          <input
+            type="text"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value.toUpperCase())}
+            placeholder={language === 'en' ? 'Filter by currency' : 'Фильтр по валюте'}
+            className={style.input}
+          />
+
+          {filteredCurrencyList.length > 0 ? (
+            <ul className={style.rateList}>
+              {filteredCurrencyList.map((c, idx) => (
+                <li key={idx} className={style.rateItem}>
+                  <span className={style.ratePair}>
+                    {c.from}/{c.to}
+                  </span>
+                  <span className={`${style.rateValue} ${c.change > 0 ? style.up : style.down}`}>
+                    {c.rate} {c.change > 0 ? '↑' : c.change < 0 ? '↓' : '→'}
+                  </span>
+                </li>
+              ))}
+            </ul>
           ) : (
             <p className={style.rate}>
-              {language === 'en' ? 'Waiting for updates...' : 'Ожидание обновлений...'}
+              {language === 'en' ? 'No matching currencies...' : 'Валюты не найдены...'}
             </p>
           )}
         </div>

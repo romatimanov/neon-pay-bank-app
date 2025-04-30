@@ -17,6 +17,26 @@
   padding: 25px;
   background: #fff;
   border-radius: 15px;
+  max-height: 350px;
+  overflow: auto;
+}
+.rateList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.up {
+  color: green;
+}
+.down {
+  color: red;
+}
+.rateList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  color: #000;
 }
 .rate {
   color: #000;
