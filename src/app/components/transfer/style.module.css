@@ -18,6 +18,7 @@
   padding: 25px;
   background: #fff;
   border-radius: 15px;
+  min-height: 344px;
   max-height: 344px;
   overflow: auto;
 }
