@@ -24,6 +24,7 @@ import { prepareChartData } from '@/utils/chartData'
 import { useRouter } from 'next/navigation'
 import { formatCardNumber } from '@/utils/formatCardNumber'
 import { Loader } from '@/ui/loader/Loader'
+import { useResize } from '@/app/hook/useResize'
 
 const GET_ACCOUNTS = gql`
   query {
@@ -45,7 +46,7 @@ export function Cards() {
   const { data, loading, error } = useQuery(GET_ACCOUNTS, { client })
   const firstAccount = data?.accounts?.[0]?.account
   const route = useRouter()
-
+  const resize = useResize(1220)
   const sortedData = [...(data?.accounts || [])].sort((a, b) => b.balance - a.balance)
 
   const CustomCursor = (props: any) => {
@@ -184,14 +185,14 @@ export function Cards() {
             {language === 'en' ? 'Expense Statistics' : 'Статистика расходов'}
           </h2>
         </div>
-        <PieChart width={730} height={250}>
+        <PieChart width={730} height={294}>
           <Pie
             data={pieData}
             dataKey="value"
             nameKey="name"
             cx="50%"
             cy="50%"
-            outerRadius={250}
+            outerRadius={resize ? 150 : 250}
             label
           >
             {pieData.map((entry, index) => (
